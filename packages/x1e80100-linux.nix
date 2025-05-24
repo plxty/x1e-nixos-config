@@ -16,7 +16,7 @@ linuxPackagesFor (buildLinux {
     hash = "sha256-KuSUZo+tdMOVSf6uuO9iaR+rhmSb4ZrBKGaFmOrs5DE=";
   };
   version = "6.15.0-rc7";
-  defconfig = "johan_defconfig";
+  defconfig = "maud_defconfig";
 
   structuredExtraConfig = with lib.kernel; {
     VIRTUALIZATION = yes;
@@ -29,6 +29,13 @@ linuxPackagesFor (buildLinux {
   ignoreConfigErrors = true;
 
   kernelPatches = [
+    {
+      name = "Add devices support for ASUS Vivobook S 15";
+      patch = fetchurl {
+        url = "https://github.com/jhovold/linux/compare/wip/x1e80100-6.15-rc4...SpieringsAE:linux:wip/x1e80100-6.15-rc4.patch";
+        hash = "sha256-WyJ6h6hSjp/41o4z9uHmOfUnEKjVl1YqelNFETOztso=";
+      };
+    }
     {
       name = "Add Bluetooth support for the Lenovo Yoga Slim 7x";
       patch = fetchpatch {

@@ -74,6 +74,13 @@ in
           "phy_nxp_ptn3222"
           "phy_qcom_qmp_usb"
         ])
+
+        (lib.mkIf cfg.asus-vivobook-s15.enable [
+          "panel_samsung_atna33xc20"
+          "phy_nxp_ptn3222"
+          "phy_qcom_qmp_usb"
+          "ath12k" # WiFi
+        ])
       ];
 
       boot.kernelParams = lib.mkMerge [
@@ -98,6 +105,7 @@ in
 
       hardware.firmware = lib.mkMerge [
         (lib.mkIf cfg.lenovo-yoga-slim7x.enable [ pkgs.x1e80100-lenovo-yoga-slim7x-firmware ])
+        (lib.mkIf cfg.asus-vivobook-s15.enable [ pkgs.x1e80100-asus-vivobook-s15-firmware ])
       ];
 
       # For now the kernel is same for all of the supported devices, hopefully

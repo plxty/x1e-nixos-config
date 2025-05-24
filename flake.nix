@@ -9,7 +9,7 @@
     }:
     let
       # Modify this if you are building on something other than x86_64-linux.
-      buildSystem = "x86_64-linux";
+      buildSystem = "aarch64-linux";
 
       nixpkgs-patched =
         let
@@ -58,6 +58,7 @@
     (import ./default.nix)
     // {
       nixosConfigurations = {
+        # TODO: ISO to packages.xxx
         iso = nixpkgs.lib.nixosSystem {
           modules = [
             "${nixpkgs-patched}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
@@ -66,10 +67,21 @@
             ./modules/common.nix
             {
               nixpkgs.pkgs = pkgs-cross;
-              hardware.lenovo-yoga-slim7x.enable = true;
+              hardware.asus-vivobook-s15.enable = true;
 
               # Required to evaluate packages from `pkgs-cross` on the device.
               isoImage.storeContents = [ nixpkgs-patched ];
+
+              # Debugging:
+              boot.initrd.kernelModules = [
+                "dm_mod" # https://github.com/NixOS/nixpkgs/blob/9b5ac7ad45298d58640540d0323ca217f32a6762/nixos/modules/system/boot/kernel.nix#L343
+                "i2c_qcom_geni" # MUST load it first before other i2c
+                "i2c_hid_of" # Enable keyboard debug early
+              ];
+
+              # For stage 1 debug, remove 'dispcc*' driver within /lib/modules
+              # can keep the console (display) while debugging.
+              boot.initrd.preDeviceCommands = "fail";
             }
           ];
         };
@@ -82,7 +94,7 @@
               { lib, ... }:
               {
                 nixpkgs.pkgs = nixpkgs.legacyPackages.aarch64-linux;
-                hardware.lenovo-yoga-slim7x.enable = true;
+                hardware.asus-vivobook-s15.enable = true;
 
                 # Copy the cross-compiled kernel from the install ISO. Remove
                 # this if you want to natively compile the kernel on your device.
